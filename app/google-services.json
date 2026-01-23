@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "374062392158",
+    "project_id": "quizapp-6d31a",
+    "storage_bucket": "quizapp-6d31a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:374062392158:android:0b73fa6864f0e2681a65cf",
+        "android_client_info": {
+          "package_name": "com.example.haynews"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjVC1eMnxCPGdKdP4gjabj5HJ9WcIEmsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,124 @@
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeRefresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Top Bar: Welcome + Navigation Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:id="@+id/textWelcome"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A1A"/>
+
+            <ImageButton
+                android:id="@+id/buttonSearch"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@null"
+                app:tint="@color/primary"
+                android:src="@android:drawable/ic_menu_search"
+                android:contentDescription="Search"/>
+
+            <ImageButton
+                android:id="@+id/buttonBookmarks"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@null"
+                app:tint="@color/primary"
+                android:src="@android:drawable/ic_menu_agenda"
+                android:contentDescription="Bookmarks"
+                android:layout_marginStart="8dp"/>
+
+            <ImageButton
+                android:id="@+id/buttonTrending"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@null"
+                app:tint="@color/primary"
+                android:src="@android:drawable/ic_menu_view"
+                android:contentDescription="Trending"
+                android:layout_marginStart="8dp"/>
+
+            <ImageButton
+                android:id="@+id/buttonProfile"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@null"
+                app:tint="@color/primary"
+                android:src="@drawable/ic_profile"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+        <!-- Recommended -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Recommended for you"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:paddingBottom="8dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerRecommended"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:paddingBottom="24dp"/>
+
+        <!-- Trending -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trending Now"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:paddingBottom="8dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerTrending"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="24dp"/>
+
+        <!-- Local News -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Local News"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:paddingBottom="8dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerLocal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</ScrollView>
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
