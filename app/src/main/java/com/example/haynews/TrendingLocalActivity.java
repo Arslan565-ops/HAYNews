@@ -29,7 +29,8 @@ public class TrendingLocalActivity extends AppCompatActivity {
     private TextView textTrendingEmpty, textLocalEmpty;
     private NewsService newsService;
     private FusedLocationProviderClient locationClient;
-    private String userRegion = "us";
+    // Default region set to Pakistan ("pk") for local news
+    private String userRegion = "pk";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +85,8 @@ public class TrendingLocalActivity extends AppCompatActivity {
 
     private void loadUserRegion() {
         SharedPreferences prefs = getSharedPreferences("UserData", MODE_PRIVATE);
-        userRegion = prefs.getString("user_region", "us");
+        // If user has not chosen a region yet, default to Pakistan
+        userRegion = prefs.getString("user_region", "pk");
         
         // Try to get location if permission granted
         // For now, use saved preference or default
@@ -93,8 +95,8 @@ public class TrendingLocalActivity extends AppCompatActivity {
     private void loadTrendingNews() {
         textTrendingEmpty.setVisibility(View.GONE);
         
-        // Fetch trending news (top headlines sorted by popularity)
-        newsService.fetchTopHeadlines("us", null, 20, new NewsService.NewsCallback() {
+        // Fetch trending news using search endpoint (recent Pakistan news)
+        newsService.searchNews("Pakistan", "publishedAt", 20, new NewsService.NewsCallback() {
             @Override
             public void onSuccess(List<NewsItem> articles) {
                 runOnUiThread(() -> {
@@ -129,8 +131,9 @@ public class TrendingLocalActivity extends AppCompatActivity {
     private void loadLocalNews() {
         textLocalEmpty.setVisibility(View.GONE);
         
-        // Fetch local news based on user region
-        newsService.fetchTopHeadlines(userRegion, null, 15, new NewsService.NewsCallback() {
+        // Fetch local news based on user region; for now, use Pakistan-focused search
+        String query = "Pakistan";
+        newsService.searchNews(query, "publishedAt", 15, new NewsService.NewsCallback() {
             @Override
             public void onSuccess(List<NewsItem> articles) {
                 runOnUiThread(() -> {
@@ -163,7 +166,8 @@ public class TrendingLocalActivity extends AppCompatActivity {
         intent.putExtra("title", article.title);
         intent.putExtra("meta", article.subtitle);
         intent.putExtra("image", article.imageUrl);
-        intent.putExtra("content", article.content != null ? article.content : article.description);
+        intent.putExtra("content", article.content);
+        intent.putExtra("description", article.description);
         intent.putExtra("credibility", String.valueOf(article.credibilityScore));
         intent.putExtra("url", article.url);
         intent.putExtra("source", article.source);

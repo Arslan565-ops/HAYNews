@@ -178,7 +178,8 @@ public class SearchActivity extends AppCompatActivity {
         intent.putExtra("title", article.title);
         intent.putExtra("meta", article.subtitle);
         intent.putExtra("image", article.imageUrl);
-        intent.putExtra("content", article.content != null ? article.content : article.description);
+        intent.putExtra("content", article.content);
+        intent.putExtra("description", article.description);
         intent.putExtra("credibility", String.valueOf(article.credibilityScore));
         intent.putExtra("url", article.url);
         intent.putExtra("source", article.source);

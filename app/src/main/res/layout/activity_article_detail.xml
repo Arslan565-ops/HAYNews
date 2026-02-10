@@ -82,6 +82,17 @@
             android:lineSpacingExtra="4dp"
             android:layout_marginTop="18dp" />
 
+        <!-- Read full article button -->
+        <TextView
+            android:id="@+id/textReadFull"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Read full article"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary"
+            android:layout_marginTop="12dp" />
+
         <!-- Action Buttons -->
         <LinearLayout
             android:layout_marginTop="28dp"

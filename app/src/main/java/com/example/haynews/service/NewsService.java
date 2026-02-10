@@ -70,8 +70,12 @@ public class NewsService {
      */
     public void fetchTopHeadlines(String country, String category, int pageSize, NewsCallback callback) {
         String apiKey = com.example.haynews.BuildConfig.NEWS_API_KEY;
-        
-        Call<NewsApiResponse> call = apiService.getTopHeadlines(apiKey, country, category, pageSize);
+
+        // Resolve defaults without mutating captured variables (must be effectively final)
+        final String resolvedCountry = (country == null || country.isEmpty()) ? "pk" : country;
+        final String resolvedCategory = (category == null || category.isEmpty()) ? "general" : category;
+
+        Call<NewsApiResponse> call = apiService.getTopHeadlines(apiKey, resolvedCountry, resolvedCategory, pageSize);
         call.enqueue(new Callback<NewsApiResponse>() {
             @Override
             public void onResponse(Call<NewsApiResponse> call, Response<NewsApiResponse> response) {
@@ -84,7 +88,9 @@ public class NewsService {
                         callback.onSuccess(processedArticles);
                     });
                 } else {
-                    callback.onError("Failed to fetch news: " + response.message());
+                    String errorMsg = "Failed to fetch news: code " + response.code() + " - " + response.message();
+                    Log.e(TAG, errorMsg);
+                    callback.onError(errorMsg);
                 }
             }
 
@@ -93,7 +99,7 @@ public class NewsService {
                 Log.e(TAG, "Error fetching news from NewsAPI", t);
                 // Try GNews as backup
                 if (useGNewsAsBackup) {
-                    fetchFromGNews(country, category, pageSize, callback);
+                    fetchFromGNews(resolvedCountry, resolvedCategory, pageSize, callback);
                 } else {
                     loadCachedNews(callback);
                 }
@@ -119,7 +125,9 @@ public class NewsService {
                         callback.onSuccess(processedArticles);
                     });
                 } else {
-                    callback.onError("Search failed: " + response.message());
+                    String errorMsg = "Search failed: code " + response.code() + " - " + response.message();
+                    Log.e(TAG, errorMsg);
+                    callback.onError(errorMsg);
                 }
             }
 
@@ -177,8 +185,8 @@ public class NewsService {
      * Fetches news from GNews API as backup
      */
     private void fetchFromGNews(String country, String category, int pageSize, NewsCallback callback) {
-        // GNews API key should be added to BuildConfig or gradle.properties
-        String apiKey = ""; // Add GNews API key here or from BuildConfig
+        // Use GNews API key directly here as backup provider
+        String apiKey = "d082a3be6eb9bfbea088b5638fb88607";
         
         if (apiKey.isEmpty()) {
             loadCachedNews(callback);

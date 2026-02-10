@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 public class ArticleDetailActivity extends AppCompatActivity {
 
     ImageView imgArticle, btnLike, btnBookmark, btnShare, btnDownload;
-    TextView textTitle, textMeta, textContent, textCredibility, textSource, textAuthor;
+    TextView textTitle, textMeta, textContent, textCredibility, textSource, textAuthor, textReadFull;
     
     private NewsItem currentArticle;
     private NewsService newsService;
@@ -55,6 +55,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
         textCredibility = findViewById(R.id.textCredibility);
         textSource = findViewById(R.id.textSource);
         textAuthor = findViewById(R.id.textAuthor);
+        textReadFull = findViewById(R.id.textReadFull);
 
         btnLike = findViewById(R.id.btnLike);
         btnBookmark = findViewById(R.id.btnBookmark);
@@ -69,6 +70,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
         currentArticle.subtitle = getIntent().getStringExtra("meta");
         currentArticle.imageUrl = getIntent().getStringExtra("image");
         currentArticle.content = getIntent().getStringExtra("content");
+        currentArticle.description = getIntent().getStringExtra("description");
         currentArticle.url = getIntent().getStringExtra("url");
         currentArticle.source = getIntent().getStringExtra("source");
         currentArticle.author = getIntent().getStringExtra("author");
@@ -82,7 +84,26 @@ public class ArticleDetailActivity extends AppCompatActivity {
 
         textTitle.setText(currentArticle.title);
         textMeta.setText(currentArticle.subtitle);
-        textContent.setText(currentArticle.content != null ? currentArticle.content : "Content not available");
+
+        // Show as much text as possible: description + content together
+        String descriptionText = currentArticle.description != null ? currentArticle.description.trim() : "";
+        String contentText = currentArticle.content != null ? currentArticle.content.trim() : "";
+
+        StringBuilder fullTextBuilder = new StringBuilder();
+        if (!descriptionText.isEmpty()) {
+            fullTextBuilder.append(descriptionText);
+        }
+        if (!contentText.isEmpty() && !contentText.equals(descriptionText)) {
+            if (fullTextBuilder.length() > 0) {
+                fullTextBuilder.append("\n\n");
+            }
+            fullTextBuilder.append(contentText);
+        }
+
+        String fullText = fullTextBuilder.length() > 0
+                ? fullTextBuilder.toString()
+                : "Content not available";
+        textContent.setText(fullText);
         
         if (textCredibility != null) {
             textCredibility.setText("Credibility: " + currentArticle.credibilityScore + "%");
@@ -157,13 +178,19 @@ public class ArticleDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Saved for offline reading", Toast.LENGTH_SHORT).show();
         });
 
-        // Add click listener to open full article in browser
-        textContent.setOnClickListener(v -> {
-            if (currentArticle != null && currentArticle.url != null) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentArticle.url));
-                startActivity(browserIntent);
-            }
-        });
+        // Open full article inside app WebView when user taps "Read full article"
+        if (textReadFull != null) {
+            textReadFull.setOnClickListener(v -> {
+                if (currentArticle != null && currentArticle.url != null && !currentArticle.url.isEmpty()) {
+                    android.content.Intent intent = new android.content.Intent(
+                            ArticleDetailActivity.this, ArticleWebViewActivity.class);
+                    intent.putExtra("url", currentArticle.url);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, "Full article link not available", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     @Override

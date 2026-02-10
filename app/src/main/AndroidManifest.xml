@@ -54,6 +54,9 @@
         <activity
             android:name=".TrendingLocalActivity"
             android:exported="false" />
+        <activity
+            android:name=".ArticleWebViewActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

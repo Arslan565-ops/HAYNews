@@ -139,7 +139,8 @@ public class MainActivity extends AppCompatActivity {
             userPreferences.addCategory("entertainment");
         }
 
-        userPreferences.region = prefs.getString("user_region", "us");
+        // Default region set to Pakistan ("pk") so local news is Pakistani by default
+        userPreferences.region = prefs.getString("user_region", "pk");
         newsService.setUserPreferences(userPreferences);
         newsService.setUserBehavior(userBehavior);
     }
@@ -149,12 +150,14 @@ public class MainActivity extends AppCompatActivity {
             swipeRefreshLayout.setRefreshing(true);
         }
 
-        // Fetch personalized news based on user preferences
-        String category = userPreferences.selectedCategories.isEmpty() 
-                ? null 
+        // Fetch personalized news based on user preferences using the search endpoint
+        String category = userPreferences.selectedCategories.isEmpty()
+                ? null
                 : userPreferences.selectedCategories.get(0);
-        
-        newsService.fetchTopHeadlines(userPreferences.region, category, 20, new NewsService.NewsCallback() {
+
+        String query = category != null ? category : "Pakistan";
+
+        newsService.searchNews(query, "publishedAt", 20, new NewsService.NewsCallback() {
             @Override
             public void onSuccess(List<NewsItem> articles) {
                 runOnUiThread(() -> {
@@ -183,7 +186,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadTrendingNews() {
-        newsService.fetchTopHeadlines("us", null, 10, new NewsService.NewsCallback() {
+        // Use search endpoint for trending news (recent popular Pakistan news)
+        newsService.searchNews("Pakistan", "publishedAt", 10, new NewsService.NewsCallback() {
             @Override
             public void onSuccess(List<NewsItem> articles) {
                 runOnUiThread(() -> {
@@ -199,7 +203,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadLocalNews() {
-        newsService.fetchTopHeadlines(userPreferences.region, null, 10, new NewsService.NewsCallback() {
+        // Use search endpoint for local news; if region is pk, favor Pakistan
+        String query = "Pakistan";
+        newsService.searchNews(query, "publishedAt", 10, new NewsService.NewsCallback() {
             @Override
             public void onSuccess(List<NewsItem> articles) {
                 runOnUiThread(() -> {
@@ -222,7 +228,8 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("title", article.title);
         intent.putExtra("meta", article.subtitle);
         intent.putExtra("image", article.imageUrl);
-        intent.putExtra("content", article.content != null ? article.content : article.description);
+        intent.putExtra("content", article.content);
+        intent.putExtra("description", article.description);
         intent.putExtra("credibility", String.valueOf(article.credibilityScore));
         intent.putExtra("url", article.url);
         intent.putExtra("source", article.source);
