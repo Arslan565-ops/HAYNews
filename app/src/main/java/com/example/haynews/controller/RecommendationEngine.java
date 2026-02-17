@@ -3,12 +3,8 @@ package com.example.haynews.controller;
 import com.example.haynews.NewsItem;
 import com.example.haynews.model.UserPreferences;
 import com.example.haynews.model.UserBehavior;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 public class RecommendationEngine {
     private UserPreferences preferences;
@@ -19,9 +15,6 @@ public class RecommendationEngine {
         this.behavior = behavior;
     }
 
-    /**
-     * Ranks and filters news articles based on user preferences and behavior
-     */
     public List<NewsItem> personalizeNews(List<NewsItem> articles) {
         if (articles == null || articles.isEmpty()) {
             return new ArrayList<>();

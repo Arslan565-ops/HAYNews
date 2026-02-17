@@ -2,10 +2,23 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="primary">#1565C0</color>
-    <color name="primaryDark">#0D47A1</color>
-    <color name="textPrimary">#1A1A1A</color>
-    <color name="textSecondary">#666666</color>
-    <color name="cardBackground">#F9FAFC</color>
 
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#2196F3</color>
+
+    <color name="backgroundMain">#F5F7FA</color>
+    <color name="cardBackground">#FFFFFF</color>
+    <color name="sectionBackground">#E8EEF7</color>
+
+    <color name="textPrimary">#1A1A1A</color>
+    <color name="textSecondary">#555555</color>
+    <color name="textMeta">#888888</color>
+
+    <color name="credibilityHigh">#4CAF50</color>
+    <color name="credibilityMedium">#FF9800</color>
+    <color name="credibilityLow">#F44336</color>
+
+    <color name="primary">@color/colorPrimary</color>
+    <color name="primaryDark">@color/colorPrimaryDark</color>
 </resources>

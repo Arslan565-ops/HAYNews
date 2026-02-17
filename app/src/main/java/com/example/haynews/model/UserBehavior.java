@@ -7,7 +7,7 @@ public class UserBehavior {
     public Map<String, Integer> categoryViews; // category -> view count
     public Map<String, Integer> sourceViews; // source -> view count
     public Map<String, Long> articleReadTime; // articleUrl -> read time in ms
-    public Map<String, Integer> articleInteractions; // articleUrl -> interaction count (likes, shares, etc.)
+    public Map<String, Integer> articleInteractions; // articleUrl -> interaction count
     public long totalReadingTime;
     public int totalArticlesRead;
 

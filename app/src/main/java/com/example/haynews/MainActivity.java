@@ -4,15 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.haynews.model.UserBehavior;
 import com.example.haynews.model.UserPreferences;
 import com.example.haynews.service.NewsService;
@@ -37,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Check login
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
@@ -119,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
         userPreferences = new UserPreferences();
         userBehavior = new UserBehavior();
 
-        // Load selected categories
         if (prefs.getBoolean("topic_Technology", false)) {
             userPreferences.addCategory("technology");
         }
@@ -139,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
             userPreferences.addCategory("entertainment");
         }
 
-        // Default region set to Pakistan ("pk") so local news is Pakistani by default
         userPreferences.region = prefs.getString("user_region", "pk");
         newsService.setUserPreferences(userPreferences);
         newsService.setUserBehavior(userBehavior);
@@ -150,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
             swipeRefreshLayout.setRefreshing(true);
         }
 
-        // Fetch personalized news based on user preferences using the search endpoint
         String category = userPreferences.selectedCategories.isEmpty()
                 ? null
                 : userPreferences.selectedCategories.get(0);
@@ -203,7 +196,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadLocalNews() {
-        // Use search endpoint for local news; if region is pk, favor Pakistan
         String query = "Pakistan";
         newsService.searchNews(query, "publishedAt", 10, new NewsService.NewsCallback() {
             @Override
@@ -221,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openArticleDetail(NewsItem article) {
-        // Record user interaction
         newsService.recordArticleInteraction(article, article.category != null ? article.category : "general");
 
         Intent intent = new Intent(this, ArticleDetailActivity.class);
@@ -240,7 +231,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Refresh data when returning to activity
         loadRecommendedNews();
     }
 }

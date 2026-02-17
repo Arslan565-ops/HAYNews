@@ -8,7 +8,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -32,6 +34,7 @@ public class SearchActivity extends AppCompatActivity {
     private NewsAdapter adapter;
     private NewsService newsService;
     private TextView textEmpty;
+    private ImageButton btnSearch;
 
     private String selectedCategory = "all";
     private String selectedRegion = "us";
@@ -41,7 +44,6 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        // Check authentication
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             startActivity(new Intent(this, LoginActivity.class));
@@ -65,6 +67,9 @@ public class SearchActivity extends AppCompatActivity {
         ImageButton btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
+        btnSearch = findViewById(R.id.btnSearch);
+        btnSearch.setOnClickListener(v -> performSearch());
+
         newsService = new NewsService(this);
     }
 
@@ -76,7 +81,6 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void setupSpinners() {
-        // Category spinner
         ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.createFromResource(
                 this, R.array.categories, android.R.layout.simple_spinner_item);
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -86,9 +90,6 @@ public class SearchActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String[] categories = getResources().getStringArray(R.array.categories);
                 selectedCategory = categories[position].toLowerCase();
-                if (selectedCategory.equals("all")) {
-                    performSearch();
-                }
             }
 
             @Override
@@ -107,7 +108,6 @@ public class SearchActivity extends AppCompatActivity {
                 String[] regionCodes = getResources().getStringArray(R.array.region_codes);
                 if (position < regionCodes.length) {
                     selectedRegion = regionCodes[position];
-                    performSearch();
                 }
             }
 
@@ -126,13 +126,21 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length() > 2) {
-                    performSearch();
-                } else if (s.length() == 0) {
+                if (s.length() == 0) {
                     adapter.updateData(new ArrayList<>());
                     textEmpty.setVisibility(View.GONE);
                 }
             }
+        });
+
+        editSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                            && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                performSearch();
+                return true;
+            }
+            return false;
         });
     }
 

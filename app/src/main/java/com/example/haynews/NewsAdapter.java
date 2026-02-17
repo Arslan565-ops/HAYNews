@@ -61,13 +61,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
         holder.txtTitle.setText(item.title);
         holder.txtSubtitle.setText(item.subtitle);
 
-        // Safely load image: some articles may not have an image URL
         if (item.imageUrl != null && !item.imageUrl.isEmpty()) {
             Picasso.get()
                     .load(item.imageUrl)
                     .into(holder.imgNews);
         } else {
-            // Optional: set a placeholder or clear previous image
             holder.imgNews.setImageDrawable(null);
         }
 
@@ -75,7 +73,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
             if (onItemClickListener != null) {
                 onItemClickListener.onItemClick(item);
             } else {
-                // Fallback to default behavior
                 Intent intent = new Intent(v.getContext(), ArticleDetailActivity.class);
                 intent.putExtra("title", item.title);
                 intent.putExtra("meta", item.subtitle);

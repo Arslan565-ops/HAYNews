@@ -4,16 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFFFFF">
+    android:background="@color/backgroundMain">
 
-    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="16dp"
-        android:background="?attr/colorPrimary">
+        android:background="@color/colorPrimary">
 
         <ImageButton
             android:id="@+id/btnBack"
@@ -31,26 +30,44 @@
             android:text="Search News"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white"
             android:layout_marginStart="16dp"/>
     </LinearLayout>
 
-    <!-- Search Bar and Filters -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@color/backgroundMain">
 
-        <EditText
-            android:id="@+id/editSearch"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Search articles..."
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text"
-            android:inputType="text"
-            android:textSize="16sp"/>
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editSearch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Search articles..."
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:textSize="16sp"/>
+
+            <ImageButton
+                android:id="@+id/btnSearch"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="8dp"
+                android:background="@null"
+                android:contentDescription="Search"
+                android:src="@android:drawable/ic_menu_search"
+                app:tint="@color/colorPrimary" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -63,17 +80,18 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp"
+                android:background="@color/toggle_selector"/>
 
             <Spinner
                 android:id="@+id/spinnerRegion"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:background="@color/toggle_selector"/>
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Empty State -->
     <TextView
         android:id="@+id/textEmpty"
         android:layout_width="match_parent"
@@ -81,10 +99,9 @@
         android:gravity="center"
         android:text="Enter search query"
         android:textSize="16sp"
-        android:textColor="#999999"
+        android:textColor="@color/textMeta"
         android:visibility="gone"/>
 
-    <!-- Results -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"

@@ -1,21 +1,15 @@
 package com.example.haynews;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.haynews.database.NewsDatabase;
 import com.example.haynews.database.NewsDao;
 import com.example.haynews.service.NewsService;
-import com.example.haynews.utils.NewsMapper;
 import com.squareup.picasso.Picasso;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -85,7 +79,6 @@ public class ArticleDetailActivity extends AppCompatActivity {
         textTitle.setText(currentArticle.title);
         textMeta.setText(currentArticle.subtitle);
 
-        // Show as much text as possible: description + content together
         String descriptionText = currentArticle.description != null ? currentArticle.description.trim() : "";
         String contentText = currentArticle.content != null ? currentArticle.content.trim() : "";
 
@@ -136,8 +129,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
     }
 
     private void updateButtonStates() {
-        // Update bookmark button visual state if needed
-        // You can add drawable changes here
+
     }
 
     private void setupButtons() {
@@ -178,7 +170,6 @@ public class ArticleDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Saved for offline reading", Toast.LENGTH_SHORT).show();
         });
 
-        // Open full article inside app WebView when user taps "Read full article"
         if (textReadFull != null) {
             textReadFull.setOnClickListener(v -> {
                 if (currentArticle != null && currentArticle.url != null && !currentArticle.url.isEmpty()) {

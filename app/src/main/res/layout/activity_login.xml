@@ -9,7 +9,6 @@
     android:padding="24dp"
     tools:context=".LoginActivity">
 
-    <!-- LOG IN Title -->
     <TextView
         android:id="@+id/textLoginTitle"
         android:layout_width="wrap_content"
@@ -23,7 +22,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="100dp"/>
 
-    <!-- Email Field -->
     <EditText
         android:id="@+id/editTextEmail"
         android:layout_width="0dp"
@@ -39,7 +37,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="32dp"/>
 
-    <!-- Password Field -->
     <EditText
         android:id="@+id/editTextPassword"
         android:layout_width="0dp"
@@ -55,7 +52,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
 
-    <!-- Forgot Password -->
     <TextView
         android:id="@+id/textForgotPassword"
         android:layout_width="wrap_content"
@@ -67,7 +63,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"/>
 
-    <!-- Login Button -->
     <Button
         android:id="@+id/btnLogin"
         android:layout_width="0dp"
@@ -83,7 +78,6 @@
         android:layout_marginTop="24dp"
         android:fontFamily="sans-serif-medium"/>
 
-    <!-- Sign Up Text -->
     <TextView
         android:id="@+id/textSignUpLabel"
         android:layout_width="wrap_content"
@@ -96,7 +90,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp"/>
 
-    <!-- Sign Up Link -->
     <TextView
         android:id="@+id/textSignUp"
         android:layout_width="wrap_content"

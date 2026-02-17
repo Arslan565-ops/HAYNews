@@ -20,7 +20,7 @@
             android:exported="false" />
         <activity
             android:name=".ArticleDetailActivity"
-            android:exported="false" /> <!-- SPLASH SCREEN -->
+            android:exported="false" />
         <activity
             android:name=".StartActivity"
             android:exported="true">
@@ -29,19 +29,19 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- SIGNUP SCREEN -->
+        </activity>
         <activity
             android:name=".LoginActivity"
-            android:exported="false" /> <!-- FORGOT PASSWORD SCREEN -->
+            android:exported="false" />
         <activity
             android:name=".SignupActivity"
-            android:exported="false" /> <!-- FORGOT PASSWORD SCREEN -->
+            android:exported="false" />
         <activity
             android:name=".ForgotPasswordActivity"
-            android:exported="false" /> <!-- HOME (Select Topics) SCREEN -->
+            android:exported="false" />
         <activity
             android:name=".HomeActivity"
-            android:exported="false" /> <!-- MAIN ACTIVITY (News Feed) -->
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />

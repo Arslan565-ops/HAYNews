@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">HAYNews</string>
-    
-    <!-- Categories -->
+
     <string-array name="categories">
         <item>All</item>
         <item>Technology</item>
@@ -14,7 +13,6 @@
         <item>General</item>
     </string-array>
     
-    <!-- Regions -->
     <string-array name="regions">
         <item>United States</item>
         <item>United Kingdom</item>
@@ -28,7 +26,6 @@
         <item>China</item>
     </string-array>
     
-    <!-- Region Codes -->
     <string-array name="region_codes">
         <item>us</item>
         <item>gb</item>

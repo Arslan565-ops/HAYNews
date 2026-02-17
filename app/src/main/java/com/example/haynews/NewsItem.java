@@ -1,7 +1,6 @@
 package com.example.haynews;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class NewsItem implements Serializable {
     public String title;
@@ -18,14 +17,12 @@ public class NewsItem implements Serializable {
     public boolean isDownloaded;
     public String description;
 
-    // Default constructor
     public NewsItem() {
         this.credibilityScore = 0;
         this.isBookmarked = false;
         this.isDownloaded = false;
     }
 
-    // Constructor for basic news item
     public NewsItem(String title, String subtitle, String imageUrl) {
         this.title = title;
         this.subtitle = subtitle;
@@ -35,7 +32,6 @@ public class NewsItem implements Serializable {
         this.isDownloaded = false;
     }
 
-    // Full constructor
     public NewsItem(String title, String subtitle, String imageUrl, String content,
                    String source, String author, String url, String category,
                    String publishedAt, String description) {

@@ -20,7 +20,6 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // Initialize buttons
         btnTech = findViewById(R.id.btnTech);
         btnSports = findViewById(R.id.btnSports);
         btnPolitics = findViewById(R.id.btnPolitics);
@@ -65,13 +64,11 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
 
-        // Save that topics are selected
         editor.putBoolean("topicsSelected", true);
         editor.apply();
 
         Toast.makeText(this, "Topics Saved", Toast.LENGTH_SHORT).show();
 
-        // Go to main news screen
         startActivity(new Intent(HomeActivity.this, MainActivity.class));
         finish();
     }

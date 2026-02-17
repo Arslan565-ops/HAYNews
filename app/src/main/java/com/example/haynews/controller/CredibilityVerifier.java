@@ -1,14 +1,10 @@
 package com.example.haynews.controller;
 
 import com.example.haynews.NewsItem;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 public class CredibilityVerifier {
-    // Trusted news sources (can be expanded)
+    // Trusted news sources
     private static final List<String> TRUSTED_SOURCES = List.of(
             "BBC News", "Reuters", "Associated Press", "The Guardian",
             "CNN", "The New York Times", "Washington Post", "NPR",
@@ -21,9 +17,6 @@ public class CredibilityVerifier {
             "INSTANTLY", "GUARANTEED", "MIRACLE", "SECRET"
     );
 
-    /**
-     * Verifies article credibility based on multiple factors
-     */
     public int verifyCredibility(NewsItem article, List<NewsItem> similarArticles) {
         int score = 50; // Base score
 
@@ -32,7 +25,7 @@ public class CredibilityVerifier {
             if (TRUSTED_SOURCES.contains(article.source)) {
                 score += 30;
             } else {
-                // Check if source is in trusted list (case-insensitive)
+                // Check if source is in trusted list
                 boolean isTrusted = TRUSTED_SOURCES.stream()
                         .anyMatch(trusted -> trusted.equalsIgnoreCase(article.source));
                 if (isTrusted) {
@@ -131,10 +124,6 @@ public class CredibilityVerifier {
         int totalWords = Math.max(words1.length, words2.length);
         return totalWords > 0 ? (double) commonWords / totalWords : 0.0;
     }
-
-    /**
-     * Tags article with credibility status
-     */
     public String getCredibilityStatus(int score) {
         if (score >= 80) {
             return "Highly Credible";

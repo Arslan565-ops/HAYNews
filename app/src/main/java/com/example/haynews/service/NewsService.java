@@ -64,14 +64,9 @@ public class NewsService {
         void onSuccess(List<NewsItem> articles);
         void onError(String error);
     }
-
-    /**
-     * Fetches top headlines from NewsAPI
-     */
     public void fetchTopHeadlines(String country, String category, int pageSize, NewsCallback callback) {
         String apiKey = com.example.haynews.BuildConfig.NEWS_API_KEY;
 
-        // Resolve defaults without mutating captured variables (must be effectively final)
         final String resolvedCountry = (country == null || country.isEmpty()) ? "pk" : country;
         final String resolvedCategory = (category == null || category.isEmpty()) ? "general" : category;
 
@@ -106,10 +101,6 @@ public class NewsService {
             }
         });
     }
-
-    /**
-     * Searches news articles
-     */
     public void searchNews(String query, String sortBy, int pageSize, NewsCallback callback) {
         String apiKey = com.example.haynews.BuildConfig.NEWS_API_KEY;
         
@@ -127,25 +118,37 @@ public class NewsService {
                 } else {
                     String errorMsg = "Search failed: code " + response.code() + " - " + response.message();
                     Log.e(TAG, errorMsg);
-                    callback.onError(errorMsg);
+
+                    // If NewsAPI search is rate-limited or fails, try GNews search as backup
+                    if (useGNewsAsBackup) {
+                        fetchSearchFromGNews(query, pageSize, callback);
+                    } else {
+                        callback.onError(errorMsg);
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<NewsApiResponse> call, Throwable t) {
                 Log.e(TAG, "Error searching news", t);
-                callback.onError("Network error: " + t.getMessage());
+
+                if (useGNewsAsBackup) {
+                    fetchSearchFromGNews(query, pageSize, callback);
+                } else {
+                    callback.onError("Network error: " + t.getMessage());
+                }
             }
         });
     }
-
-    /**
-     * Processes articles: verifies credibility and personalizes
-     */
     private List<NewsItem> processArticles(List<NewsItem> articles) {
         List<NewsItem> processed = new ArrayList<>();
         
         for (NewsItem article : articles) {
+            // Filter out unwanted sources (e.g., Indian sites that may be blocked locally)
+            if (isBlockedSource(article)) {
+                continue;
+            }
+
             // Verify credibility
             int credibilityScore = credibilityVerifier.verifyCredibility(article, articles);
             article.credibilityScore = credibilityScore;
@@ -164,9 +167,33 @@ public class NewsService {
         return processed;
     }
 
-    /**
-     * Saves article to local database
-     */
+    private boolean isBlockedSource(NewsItem article) {
+        if (article == null) return true;
+
+        String url = article.url != null ? article.url.toLowerCase() : "";
+        String sourceName = article.source != null ? article.source.toLowerCase() : "";
+
+        // Skip common Indian news domains
+        String[] blockedDomains = {
+                "https://timesofindia.indiatimes.com/",
+                "https://www.ndtv.com/",
+                "https://www.indiatoday.in/",
+                "https://www.hindustantimes.com/"
+        };
+
+        for (String domain : blockedDomains) {
+            if (!domain.isEmpty() && url.contains(domain)) {
+                return true;
+            }
+        }
+
+        // Also skip if source name clearly mentions "india" or "indian"
+        if (sourceName.contains("india") || sourceName.contains("indian")) {
+            return true;
+        }
+
+        return false;
+    }
     private void saveArticleToDatabase(NewsItem article) {
         executorService.execute(() -> {
             NewsEntity entity = NewsMapper.newsItemToEntity(article);
@@ -180,12 +207,7 @@ public class NewsService {
             }
         });
     }
-
-    /**
-     * Fetches news from GNews API as backup
-     */
     private void fetchFromGNews(String country, String category, int pageSize, NewsCallback callback) {
-        // Use GNews API key directly here as backup provider
         String apiKey = "d082a3be6eb9bfbea088b5638fb88607";
         
         if (apiKey.isEmpty()) {
@@ -219,9 +241,41 @@ public class NewsService {
         });
     }
 
-    /**
-     * Loads cached news from database
-     */
+    private void fetchSearchFromGNews(String query, int pageSize, NewsCallback callback) {
+        String apiKey = "d082a3be6eb9bfbea088b5638fb88607";
+
+        if (apiKey.isEmpty()) {
+            loadCachedNews(callback);
+            return;
+        }
+
+        Call<GNewsApiService.GNewsResponse> call = gNewsApiService.searchNews(
+                apiKey, query, pageSize, "en");
+
+        call.enqueue(new retrofit2.Callback<GNewsApiService.GNewsResponse>() {
+            @Override
+            public void onResponse(Call<GNewsApiService.GNewsResponse> call,
+                                   Response<GNewsApiService.GNewsResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<NewsItem> articles = GNewsMapper.mapGNewsResponseToNewsItems(response.body());
+                    executorService.execute(() -> {
+                        List<NewsItem> processedArticles = processArticles(articles);
+                        callback.onSuccess(processedArticles);
+                    });
+                } else {
+                    String errorMsg = "GNews search failed: code " + response.code() + " - " + response.message();
+                    Log.e(TAG, errorMsg);
+                    callback.onError(errorMsg);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GNewsApiService.GNewsResponse> call, Throwable t) {
+                Log.e(TAG, "Error searching news from GNews", t);
+                callback.onError("Network error: " + t.getMessage());
+            }
+        });
+    }
     private void loadCachedNews(NewsCallback callback) {
         executorService.execute(() -> {
             List<NewsEntity> entities = newsDao.getAllDownloaded();
@@ -229,10 +283,6 @@ public class NewsService {
             callback.onSuccess(articles);
         });
     }
-
-    /**
-     * Bookmarks an article
-     */
     public void bookmarkArticle(NewsItem article, boolean isBookmarked) {
         executorService.execute(() -> {
             newsDao.updateBookmarkStatus(article.url, isBookmarked);
@@ -241,20 +291,12 @@ public class NewsService {
             }
         });
     }
-
-    /**
-     * Downloads article for offline reading
-     */
     public void downloadArticle(NewsItem article) {
         executorService.execute(() -> {
             newsDao.updateDownloadStatus(article.url, true);
             saveArticleToDatabase(article);
         });
     }
-
-    /**
-     * Records user interaction with article
-     */
     public void recordArticleInteraction(NewsItem article, String category) {
         executorService.execute(() -> {
             userBehavior.recordCategoryView(category);

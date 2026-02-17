@@ -29,7 +29,6 @@ public class TrendingLocalActivity extends AppCompatActivity {
     private TextView textTrendingEmpty, textLocalEmpty;
     private NewsService newsService;
     private FusedLocationProviderClient locationClient;
-    // Default region set to Pakistan ("pk") for local news
     private String userRegion = "pk";
 
     @Override
@@ -37,7 +36,6 @@ public class TrendingLocalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trending_local);
 
-        // Check authentication
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             startActivity(new Intent(this, LoginActivity.class));
@@ -85,17 +83,11 @@ public class TrendingLocalActivity extends AppCompatActivity {
 
     private void loadUserRegion() {
         SharedPreferences prefs = getSharedPreferences("UserData", MODE_PRIVATE);
-        // If user has not chosen a region yet, default to Pakistan
         userRegion = prefs.getString("user_region", "pk");
-        
-        // Try to get location if permission granted
-        // For now, use saved preference or default
     }
 
     private void loadTrendingNews() {
         textTrendingEmpty.setVisibility(View.GONE);
-        
-        // Fetch trending news using search endpoint (recent Pakistan news)
         newsService.searchNews("Pakistan", "publishedAt", 20, new NewsService.NewsCallback() {
             @Override
             public void onSuccess(List<NewsItem> articles) {
@@ -106,8 +98,7 @@ public class TrendingLocalActivity extends AppCompatActivity {
                         textTrendingEmpty.setText("No trending news available");
                     } else {
                         textTrendingEmpty.setVisibility(View.GONE);
-                        // Take top 10 as trending
-                        List<NewsItem> trending = articles.size() > 10 
+                        List<NewsItem> trending = articles.size() > 10
                                 ? articles.subList(0, 10) 
                                 : articles;
                         trendingAdapter.updateData(trending);
@@ -131,7 +122,6 @@ public class TrendingLocalActivity extends AppCompatActivity {
     private void loadLocalNews() {
         textLocalEmpty.setVisibility(View.GONE);
         
-        // Fetch local news based on user region; for now, use Pakistan-focused search
         String query = "Pakistan";
         newsService.searchNews(query, "publishedAt", 15, new NewsService.NewsCallback() {
             @Override

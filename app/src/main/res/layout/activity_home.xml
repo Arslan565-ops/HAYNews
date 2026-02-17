@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#EFEFEF">
@@ -11,7 +10,6 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- TITLE -->
         <TextView
             android:id="@+id/textTitle"
             android:layout_width="wrap_content"
@@ -22,7 +20,6 @@
             android:textColor="#1A1A1A"
             android:layout_marginBottom="24dp"/>
 
-        <!-- GRID LAYOUT FOR TOPICS -->
         <GridLayout
             android:id="@+id/gridTopics"
             android:layout_width="match_parent"
@@ -33,7 +30,6 @@
             android:columnOrderPreserved="false"
             android:useDefaultMargins="true">
 
-            <!-- Topic Buttons with selector -->
             <ToggleButton
                 android:id="@+id/btnTech"
                 android:layout_width="0dp"
@@ -102,7 +98,6 @@
 
         </GridLayout>
 
-        <!-- CONTINUE BUTTON -->
         <Button
             android:id="@+id/btnContinue"
             android:layout_width="match_parent"
