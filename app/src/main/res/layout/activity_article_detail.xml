@@ -94,33 +94,41 @@
 
             <ImageView
                 android:id="@+id/btnLike"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/article_action_bg"
                 android:src="@drawable/ic_like"
+                android:padding="8dp"
                 app:tint="@color/primary" />
 
             <ImageView
                 android:id="@+id/btnBookmark"
-                android:layout_marginStart="28dp"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_marginStart="20dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/article_action_bg"
                 android:src="@drawable/ic_bookmark"
+                android:padding="8dp"
                 app:tint="@color/primary"/>
 
             <ImageView
                 android:id="@+id/btnShare"
-                android:layout_marginStart="28dp"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_marginStart="20dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/article_action_bg"
                 android:src="@drawable/ic_share"
+                android:padding="8dp"
                 app:tint="@color/primary"/>
 
             <ImageView
                 android:id="@+id/btnDownload"
-                android:layout_marginStart="28dp"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_marginStart="20dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/article_action_bg"
                 android:src="@drawable/ic_download"
+                android:padding="8dp"
                 app:tint="@color/primary"/>
         </LinearLayout>
 

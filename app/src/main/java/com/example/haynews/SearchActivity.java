@@ -37,7 +37,8 @@ public class SearchActivity extends AppCompatActivity {
     private ImageButton btnSearch;
 
     private String selectedCategory = "all";
-    private String selectedRegion = "us";
+    private String selectedRegionCode = "us";
+    private String selectedRegionName = "United States";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +91,11 @@ public class SearchActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String[] categories = getResources().getStringArray(R.array.categories);
                 selectedCategory = categories[position].toLowerCase();
+
+                // If user already typed something, update results when category changes
+                if (!editSearch.getText().toString().trim().isEmpty()) {
+                    performSearch();
+                }
             }
 
             @Override
@@ -107,7 +113,13 @@ public class SearchActivity extends AppCompatActivity {
                 String[] regions = getResources().getStringArray(R.array.regions);
                 String[] regionCodes = getResources().getStringArray(R.array.region_codes);
                 if (position < regionCodes.length) {
-                    selectedRegion = regionCodes[position];
+                    selectedRegionCode = regionCodes[position];
+                    selectedRegionName = regions[position];
+                }
+
+                // If there is already a query or a non-all category selected, re-run search when region changes
+                if (!editSearch.getText().toString().trim().isEmpty() || !"all".equals(selectedCategory)) {
+                    performSearch();
                 }
             }
 
@@ -128,7 +140,8 @@ public class SearchActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 if (s.length() == 0) {
                     adapter.updateData(new ArrayList<>());
-                    textEmpty.setVisibility(View.GONE);
+                    textEmpty.setVisibility(View.VISIBLE);
+                    textEmpty.setText("Enter a keyword or choose filters");
                 }
             }
         });
@@ -146,17 +159,76 @@ public class SearchActivity extends AppCompatActivity {
 
     private void performSearch() {
         String query = editSearch.getText().toString().trim();
-        
-        if (query.isEmpty() && selectedCategory.equals("all")) {
-            adapter.updateData(new ArrayList<>());
+        // Normalize category value
+        String categoryValue = selectedCategory != null ? selectedCategory.toLowerCase() : "all";
+
+        // If nothing typed and category is "all", show top headlines for the selected region
+        if (query.isEmpty() && "all".equals(categoryValue)) {
             textEmpty.setVisibility(View.GONE);
+            newsService.fetchTopHeadlines(selectedRegionCode, null, 20, new NewsService.NewsCallback() {
+                @Override
+                public void onSuccess(List<NewsItem> articles) {
+                    runOnUiThread(() -> {
+                        if (articles.isEmpty()) {
+                            textEmpty.setVisibility(View.VISIBLE);
+                            textEmpty.setText("No top headlines found");
+                        } else {
+                            textEmpty.setVisibility(View.GONE);
+                        }
+                        adapter.updateData(articles);
+                    });
+                }
+
+                @Override
+                public void onError(String error) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(SearchActivity.this, error, Toast.LENGTH_SHORT).show();
+                        textEmpty.setVisibility(View.VISIBLE);
+                        textEmpty.setText("Error: " + error);
+                    });
+                }
+            });
             return;
         }
 
         textEmpty.setVisibility(View.GONE);
-        String searchQuery = query.isEmpty() ? selectedCategory : query;
 
-        newsService.searchNews(searchQuery, "relevancy", 20, new NewsService.NewsCallback() {
+        // If user didn't type anything but chose a specific category, use top headlines for that region+category
+        if (query.isEmpty() && !"all".equals(categoryValue)) {
+            String apiCategory = mapToNewsApiCategory(categoryValue);
+            newsService.fetchTopHeadlines(selectedRegionCode, apiCategory, 20, new NewsService.NewsCallback() {
+                @Override
+                public void onSuccess(List<NewsItem> articles) {
+                    runOnUiThread(() -> {
+                        if (articles.isEmpty()) {
+                            textEmpty.setVisibility(View.VISIBLE);
+                            textEmpty.setText("No articles found for this filter");
+                        } else {
+                            textEmpty.setVisibility(View.GONE);
+                        }
+                        adapter.updateData(articles);
+                    });
+                }
+
+                @Override
+                public void onError(String error) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(SearchActivity.this, error, Toast.LENGTH_SHORT).show();
+                        textEmpty.setVisibility(View.VISIBLE);
+                        textEmpty.setText("Error: " + error);
+                    });
+                }
+            });
+            return;
+        }
+
+        // Text query present: bias search towards selected region by appending region name
+        String baseQuery = query;
+        if (selectedRegionName != null && !selectedRegionName.isEmpty()) {
+            baseQuery = baseQuery + " " + selectedRegionName;
+        }
+
+        newsService.searchNews(baseQuery, "relevancy", 20, new NewsService.NewsCallback() {
             @Override
             public void onSuccess(List<NewsItem> articles) {
                 runOnUiThread(() -> {
@@ -179,6 +251,32 @@ public class SearchActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    /**
+     * Map UI category label to a NewsAPI top-headlines category where possible.
+     */
+    private String mapToNewsApiCategory(String categoryValue) {
+        if (categoryValue == null) return null;
+        switch (categoryValue) {
+            case "technology":
+                return "technology";
+            case "sports":
+                return "sports";
+            case "health":
+                return "health";
+            case "business":
+                return "business";
+            case "entertainment":
+                return "entertainment";
+            case "science":
+                return "science";
+            case "general":
+                return "general";
+            default:
+                // "all" and unsupported ones like "politics" fall back to general
+                return "general";
+        }
     }
 
     private void openArticleDetail(NewsItem article) {

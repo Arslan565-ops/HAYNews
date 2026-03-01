@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         initializeViews();
         loadUserPreferences();
+        syncPreferencesToBackend();
         loadRecommendedNews();
         loadTrendingNews();
         loadLocalNews();
@@ -139,15 +140,50 @@ public class MainActivity extends AppCompatActivity {
         newsService.setUserBehavior(userBehavior);
     }
 
+    private void syncPreferencesToBackend() {
+        if (!getSharedPreferences("UserData", MODE_PRIVATE).getBoolean("sync_preferences_enabled", true)) {
+            return;
+        }
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+        newsService.syncPreferencesToBackend(user.getUid(), userPreferences, null, null);
+    }
+
     private void loadRecommendedNews() {
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setRefreshing(true);
         }
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            newsService.fetchRecommendationsFromBackend(user.getUid(), 20, new NewsService.NewsCallback() {
+                @Override
+                public void onSuccess(List<NewsItem> articles) {
+                    runOnUiThread(() -> {
+                        if (swipeRefreshLayout != null) {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        List<NewsItem> recommended = articles.size() > 5
+                                ? articles.subList(0, 5)
+                                : articles;
+                        recommendedAdapter.updateData(recommended);
+                    });
+                }
+
+                @Override
+                public void onError(String error) {
+                    runOnUiThread(() -> loadRecommendedNewsFallback());
+                }
+            });
+        } else {
+            loadRecommendedNewsFallback();
+        }
+    }
+
+    private void loadRecommendedNewsFallback() {
         String category = userPreferences.selectedCategories.isEmpty()
                 ? null
                 : userPreferences.selectedCategories.get(0);
-
         String query = category != null ? category : "Pakistan";
 
         newsService.searchNews(query, "publishedAt", 20, new NewsService.NewsCallback() {
@@ -157,9 +193,8 @@ public class MainActivity extends AppCompatActivity {
                     if (swipeRefreshLayout != null) {
                         swipeRefreshLayout.setRefreshing(false);
                     }
-                    // Show top 5 recommended articles
-                    List<NewsItem> recommended = articles.size() > 5 
-                            ? articles.subList(0, 5) 
+                    List<NewsItem> recommended = articles.size() > 5
+                            ? articles.subList(0, 5)
                             : articles;
                     recommendedAdapter.updateData(recommended);
                 });
@@ -171,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
                     if (swipeRefreshLayout != null) {
                         swipeRefreshLayout.setRefreshing(false);
                     }
-                    Toast.makeText(MainActivity.this, "Error loading recommended news: " + error, 
+                    Toast.makeText(MainActivity.this, "Error loading recommended news: " + error,
                             Toast.LENGTH_SHORT).show();
                 });
             }

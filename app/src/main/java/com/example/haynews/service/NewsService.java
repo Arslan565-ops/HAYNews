@@ -9,6 +9,10 @@ import com.example.haynews.api.GNewsApiService;
 import com.example.haynews.api.NewsApiClient;
 import com.example.haynews.api.NewsApiResponse;
 import com.example.haynews.api.NewsApiService;
+import com.example.haynews.api.RecommendationApiClient;
+import com.example.haynews.api.RecommendationResponse;
+import com.example.haynews.api.RecommendationApiService;
+import com.example.haynews.utils.RecommendationMapper;
 import com.example.haynews.utils.GNewsMapper;
 import com.example.haynews.controller.CredibilityVerifier;
 import com.example.haynews.controller.RecommendationEngine;
@@ -303,6 +307,67 @@ public class NewsService {
             userBehavior.recordSourceView(article.source);
             userBehavior.recordInteraction(article.url);
             userPreferences.addToHistory(article.url);
+        });
+    }
+
+    /**
+     * Fetch personalized recommendations from the backend API (based on user's reading genres).
+     * On failure or if backend is unavailable, callback receives onError and caller can fall back to local logic.
+     */
+    public void fetchRecommendationsFromBackend(String userId, int limit, NewsCallback callback) {
+        if (userId == null || userId.isEmpty()) {
+            callback.onError("No user ID");
+            return;
+        }
+        RecommendationApiService api = RecommendationApiClient.getInstance().getApiService();
+        api.getRecommendations(userId, limit).enqueue(new retrofit2.Callback<RecommendationResponse>() {
+            @Override
+            public void onResponse(retrofit2.Call<RecommendationResponse> call, retrofit2.Response<RecommendationResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<NewsItem> articles = RecommendationMapper.mapToNewsItems(response.body());
+                    callback.onSuccess(articles);
+                } else {
+                    callback.onError("Backend returned " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<RecommendationResponse> call, Throwable t) {
+                Log.e(TAG, "Backend recommendations failed", t);
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Sync user preferences (genres/categories and region) to the backend so recommendations use them.
+     */
+    public void syncPreferencesToBackend(String userId, UserPreferences preferences, final Runnable onSuccess, final Runnable onError) {
+        if (userId == null || userId.isEmpty()) {
+            if (onError != null) onError.run();
+            return;
+        }
+        RecommendationApiService api = RecommendationApiClient.getInstance().getApiService();
+        RecommendationApiService.UserPreferencesBody body = new RecommendationApiService.UserPreferencesBody(
+                preferences.selectedCategories != null ? preferences.selectedCategories : new ArrayList<>(),
+                preferences.region != null ? preferences.region : "pk"
+        );
+        api.putPreferences(userId, body).enqueue(new retrofit2.Callback<RecommendationApiService.PreferencesUpdateResponse>() {
+            @Override
+            public void onResponse(retrofit2.Call<RecommendationApiService.PreferencesUpdateResponse> call,
+                                  retrofit2.Response<RecommendationApiService.PreferencesUpdateResponse> response) {
+                if (response.isSuccessful() && onSuccess != null) {
+                    onSuccess.run();
+                } else if (onError != null) {
+                    onError.run();
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<RecommendationApiService.PreferencesUpdateResponse> call, Throwable t) {
+                Log.e(TAG, "Sync preferences to backend failed", t);
+                if (onError != null) onError.run();
+            }
         });
     }
 }
